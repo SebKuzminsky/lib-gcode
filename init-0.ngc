@@ -1,0 +1,13 @@
+
+o<init-0> sub
+    g20   (inch)
+    g17   (xy plane)
+    g90   (absolute)
+    g91.1 (arc centers are relative to arc starting point)
+    g40   (disable cutter comp)
+    g54   (switch to coordinate system 1)
+    g94   (units/minute feed mode)
+o<init-0> endsub
+
+m2
+

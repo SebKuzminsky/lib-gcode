@@ -1,0 +1,53 @@
+
+;
+; This subroutine helix-mills a hole at the specified location, of the
+; specified diameter & depth, then retracts the cutter to a specifed Z
+; level.
+;
+; Assumes that it can freely traverse to the hole location without changing
+; Z first.  Assumes that it should start cutting at Z=0.
+; 
+; Uses climb cutting (cutter to the left of the work)
+;
+; Arg 1: X coordinate of center of hole
+; Arg 2: Y coordinate of center of hole
+; Arg 3: diameter of hole
+; Arg 4: Z coordinate at bottom of hole
+; Arg 5: Retract Z level
+;
+
+o<helix-hole-1> sub
+    #<X> = #1
+    #<Y> = #2
+    #<Diameter> = #3
+    #<FinalZ> = #4
+    #<SafeZ> = #5
+
+    #<Radius> = [#<Diameter>/2]
+
+    #<ZIncrement> = 0.100
+    #<CurrentZ> = 0.050
+
+    g90.1 ; arc centers are absolute
+
+    g0 x[#<X> + #<Radius>] y[#<Y> - .5]
+    /g41 ; cutter comp on, left of work (climb milling)
+
+    g0 x[#<X> + #<Radius>] y#<Y>
+    g0 z#<CurrentZ>
+
+    o100 while [#<CurrentZ> GT #<FinalZ>]
+        #<CurrentZ> = [#<CurrentZ> - #<ZIncrement>]
+        g3 i#<X> j#<Y> z#<CurrentZ>
+    o100 endwhile
+    g3 i#<X> j#<Y> z#<CurrentZ>  ; one last lap to flatten the bottom
+
+    g40 ; cutter comp off
+
+    g0 x#<X> y#<Y>  ; move the cutter to the center of the hole before retracting
+    g0 z#<SafeZ>    ; retract cutter
+o<helix-hole-1> endsub
+
+m2
+
+

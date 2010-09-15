@@ -1,0 +1,69 @@
+
+g20 (inch)
+g90 (absolute)
+g40 (disable cutter comp)
+
+
+
+
+m3 s1000
+f10
+
+g0 z0
+
+
+
+
+;
+; Arguments for rectangular-pocket-0:
+;
+; Arg 1:  X coordinate of start of pocket
+;
+; Arg 2:  Y coordinate of start of pocket
+;
+; Arg 3:  X coordinate of end of pocket
+;
+; Arg 4:  Y coordinate of end of pocket
+;
+; Arg 5:  Z coordinate of bottom of slot
+;
+; Arg 6:  Z coordinate to retract to when finished cutting
+;
+; Arg 7:  Max depth-of-cut.  On each cut except the first, the cutter will
+;         remove no more than this much.
+;
+; Arg 8:  Finish allowance.  This much material will be left during
+;         roughing and cleaned up in the finishing pass.
+;
+
+
+;
+; one pocket without a finishing pass, then some different finishing passes
+o<rectangular-pocket-0> call [0] [4.25] [0.5] [4.75] [-0.1] [1] [.1] [0]
+
+o<rectangular-pocket-0> call [1] [4.25] [1.5] [4.75] [-0.1] [1] [.1] [0.01]
+
+o<rectangular-pocket-0> call [2.00] [4.25] [2.50] [4.75] [-0.1] [1] [.1] [0.2]
+o<rectangular-pocket-0> call [3.50] [4.25] [3.00] [4.75] [-0.1] [1] [.1] [0.2]
+o<rectangular-pocket-0> call [4.50] [4.75] [4.00] [4.25] [-0.1] [1] [.1] [0.2]
+o<rectangular-pocket-0> call [5.00] [4.75] [5.50] [4.25] [-0.1] [1] [.1] [0.2]
+
+
+; small rectangular pockets with funny aspect ratios
+o<rectangular-pocket-0> call [3.75] [4] [3.5] [0] [-0.1] [1] [.3] [0.010]
+o<rectangular-pocket-0> call [0] [4] [3] [4.1] [-0.1] [1] [.1] [0.010]
+
+
+; small square pockets with small doc
+o<rectangular-pocket-0> call [0] [0] [1] [1] [-0.1] [1] [.1] [0.010]
+o<rectangular-pocket-0> call [3] [0] [2] [1] [-0.1] [1] [.1] [0.010]
+o<rectangular-pocket-0> call [0] [3] [1] [2] [-0.1] [1] [.1] [0.010]
+o<rectangular-pocket-0> call [3] [3] [2] [2] [-0.1] [1] [.1] [0.010]
+
+
+
+
+g0 z1
+
+m2
+
