@@ -7,6 +7,7 @@ o<init-0> sub
     g40   (disable cutter comp)
     g54   (switch to coordinate system 1)
     g94   (units/minute feed mode)
+    g99   (in canned cycles, retract to the Z coordinate specified by the R word)
 o<init-0> endsub
 
 m2
