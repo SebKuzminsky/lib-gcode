@@ -1,0 +1,263 @@
+
+;
+; Better have the spindle running, speed & feed set properly, and cutter
+; comp off before calling this function!
+;
+; This subroutine makes a rectangular pocket by making the following moves:
+;
+;     1.  move the cutter to near the starting X Y coordinates, leaving
+;         a little material for the (optional) finishing pass
+;
+;     2.  plunge down to a specified Z coordinate, which will be the bottom
+;         of the pocket
+;
+;     3.  move the cutter to near the final Y coordinate, leaving a little
+;         material for the finishing pass
+;
+;     4.  move the cutter some towards the final X coordinate, no more than
+;         the specified max depth-of-cut
+;
+;     5.  move the cutter almost to the starting Y coordinate, leaving a
+;         little material for the finishing pass
+;
+;     6.  move the cutter some towards the final X coordinate
+;
+;     7.  repeat from 3 until the slot is almost done
+;
+;     8.  If the FinishAllowance argument (arg 8) is greater than zero, and
+;         do DoFinishPass is true, then do a climbing finish pass around
+;         the pocket, out to the final dimensions
+;
+; Arg 1:  X coordinate of start of pocket
+;
+; Arg 2:  Y coordinate of start of pocket
+;
+; Arg 3:  X coordinate of end of pocket
+;
+; Arg 4:  Y coordinate of end of pocket
+;
+; Arg 5:  Z coordinate of bottom of pocket
+;
+; Arg 6:  Z coordinate to retract to when finished pocketing
+;
+; Arg 7:  Max depth-of-cut.  On each cut except the first, the cutter will
+;         remove no more than this much.
+;
+; Arg 8:  Finish allowance.  This much material will be left during
+;         roughing and cleaned up in the finishing pass.  If this is 0, the
+;         pocket will be cut to size during the "roughing" passes and no
+;         finish pass will be done.
+;
+; Arg 9;  Boolean specifying whether or not to actually do the finish pass.
+;
+; The pocket will be cut *without* cutter comp, so make sure the X and Y
+; coordinates take into account the cutter radius.
+;
+
+
+o<rectangular-pocket-1-helper> sub
+    #<StartX> = #1
+    #<StartY> = #2
+
+    #<EndX> = #3
+    #<EndY> = #4
+
+    #<ZCut> = #5
+
+    #<ZSafe> = #6
+
+    #<MaxDOC> = #7
+
+    #<FinishAllowance> = #8
+    #<DoFinishPass> = #9
+
+
+    o<rectangular-pocket-1-helper-100> if [ #<StartX> LT #<EndX> ]
+        #<XDirection> = 1
+    o<rectangular-pocket-1-helper-100> else
+        #<XDirection> = -1
+    o<rectangular-pocket-1-helper-100> endif
+
+    o<rectangular-pocket-1-helper-200> if [ #<StartY> LT #<EndY> ]
+        #<YDirection> = 1
+    o<rectangular-pocket-1-helper-200> else
+        #<YDirection> = -1
+    o<rectangular-pocket-1-helper-200> endif
+
+
+    #<RoughStartX> = [ #<StartX> + [ #<XDirection> * #<FinishAllowance> ]]
+    #<RoughStartY> = [ #<StartY> + [ #<YDirection> * #<FinishAllowance> ]]
+
+    #<RoughEndX> = [ #<EndX> + [ #<XDirection> * -1 * #<FinishAllowance> ]]
+    #<RoughEndY> = [ #<EndY> + [ #<YDirection> * -1 * #<FinishAllowance> ]]
+
+
+    ; total amount of ground to cover in the roughing pass
+    ; example:
+    ;     RoughStartX = 1.010, RoughEndX = 1.990
+    ;     XDirection = 1.0
+    ;     RoughXLength = 0.980
+    #<RoughXLength> = [[ #<RoughEndX> - #<RoughStartX> ] * #<XDirection> ]
+
+    ; number of one-way passes [StartY to EndY, or EndY to StartY] to cover
+    ; all that ground, such that no pass except the first cuts more than
+    ; MaxDOC.  The first pass doesn't count.
+    ;
+    ; example:
+    ;     RoughXLength = 0.980, MaxDOC = 0.5
+    ;     RoughXOneWayPasses = FUP[0.980/0.5] = FUP[1.96] = 2
+    #<RoughXOneWayPasses> = FUP[#<RoughXLength> / #<MaxDOC>]
+
+    ; actual depth-of-cut of the roughing passes
+    ; example:
+    ;     RoughXLength = 0.980, RoughXOneWayPasses = 2
+    ;     RoughXDOC = .490
+    #<RoughXDOC> = [ #<RoughXLength> / #<RoughXOneWayPasses> ]
+
+
+    ; +1 for the initial cut
+    #<RoughXOneWayPasses> = [ #<RoughXOneWayPasses> + 1 ]
+
+
+    #<CurrentX> = #<RoughStartX>
+    #<CurrentY> = #<RoughStartY>
+
+    g0 x#<CurrentX> y#<CurrentY>
+    g0 z#<ZSafe>
+
+    ; FIXME: cutting!  flood coolant on!
+
+    g1 z#<ZCut>
+
+
+    ;
+    ; rough cut
+    ;
+
+    #<CurrentY> = #<RoughStartY>
+
+    #<Pass> = 0
+    o<rectangular-pocket-1-helper-300> while [ #<Pass> LT #<RoughXOneWayPasses> ]
+        #<Pass> = [ #<Pass> + 1 ]
+
+        o<rectangular-pocket-1-helper-310> if [ #<Pass> NE 1 ]
+            #<CurrentX> = [#<CurrentX> + [#<RoughXDOC> * #<XDirection>]]
+            g1 x#<CurrentX>
+        o<rectangular-pocket-1-helper-310> endif
+
+        o<rectangular-pocket-1-helper-320> if [ #<CurrentY> EQ #<RoughEndY> ]
+            #<CurrentY> = #<RoughStartY>
+        o<rectangular-pocket-1-helper-320> else
+            #<CurrentY> = #<RoughEndY>
+        o<rectangular-pocket-1-helper-320> endif
+
+        g1 y#<CurrentY>
+    o<rectangular-pocket-1-helper-300> endwhile
+
+
+    ;
+    ; Roughing is finished.  We're at X=RoughEndX, and either Y=RoughStartY
+    ; or Y=RoughEndY.
+    ;
+
+    ;
+    ; Ready for the finish pass.  We should do a climb cut, so counter-
+    ; clockwise around the final perimeter of the pocket.  Go into the
+    ; nearest corner, then visit the remaining corners in counter-clockwise
+    ; order.
+    ;
+
+    o<rectangular-pocket-1-helper-optional-finish-pass> if [ [#<FinishAllowance> GT 0] AND #<DoFinishPass>]
+
+        o<rectangular-pocket-1-helper-400> if [ #<EndX> GT #<StartX> ]
+            ; we finished roughing on the right
+
+            o<rectangular-pocket-1-helper-410> if [ #<CurrentY> EQ #<RoughEndY> ]
+                ; we finished roughing on the EndY side
+                g1 x#<EndX> y#<EndY>
+
+                o<rectangular-pocket-1-helper-411> if [ #<EndY> GT #<StartY> ]
+                    ; start finishing in the top right corner
+                    g1 x#<StartX> y#<EndY>
+                    g1 x#<StartX> y#<StartY>
+                    g1 x#<EndX>   y#<StartY>
+                    g1 x#<EndX>   y#<EndY>
+                o<rectangular-pocket-1-helper-411> else
+                    ; start finishing in the bottom right corner
+                    g1 x#<EndX>   y#<StartY>
+                    g1 x#<StartX> y#<StartY>
+                    g1 x#<StartX> y#<EndY>
+                    g1 x#<EndX>   y#<EndY>
+                o<rectangular-pocket-1-helper-411> endif
+
+            o<rectangular-pocket-1-helper-410> else
+                ; we finished roughing on the StartY side
+                g1 x#<EndX> y#<StartY>
+
+                o<rectangular-pocket-1-helper-412> if [ #<EndY> GT #<StartY> ]
+                    ; start finishing in the bottom right corner
+                    g1 x#<EndX>   y#<EndY>
+                    g1 x#<StartX> y#<EndY>
+                    g1 x#<StartX> y#<StartY>
+                    g1 x#<EndX>   y#<StartY>
+                o<rectangular-pocket-1-helper-412> else
+                    ; start finishing in the top right corner
+                    g1 x#<StartX> y#<StartY>
+                    g1 x#<StartX> y#<EndY>
+                    g1 x#<EndX>   y#<EndY>
+                    g1 x#<EndX>   y#<StartY>
+                o<rectangular-pocket-1-helper-412> endif
+
+            o<rectangular-pocket-1-helper-410> endif
+
+        o<rectangular-pocket-1-helper-400> else
+            ; we finished roughing on the left
+
+            o<rectangular-pocket-1-helper-420> if [ #<CurrentY> EQ #<RoughEndY> ]
+                ; we finished roughing on the EndY side
+                g1 x#<EndX> y#<EndY>
+
+                o<rectangular-pocket-1-helper-421> if [ #<EndY> GT #<StartY> ]
+                    ; start finishing in the top left corner
+                    g1 x#<EndX>   y#<StartY>
+                    g1 x#<StartX> y#<StartY>
+                    g1 x#<StartX> y#<EndY>
+                    g1 x#<EndX>   y#<EndY>
+                o<rectangular-pocket-1-helper-421> else
+                    ; start finishing in the bottom left corner
+                    g1 x#<StartX> y#<EndY>
+                    g1 x#<StartX> y#<StartY>
+                    g1 x#<EndX>   y#<StartY>
+                    g1 x#<EndX>   y#<EndY>
+                o<rectangular-pocket-1-helper-421> endif
+
+            o<rectangular-pocket-1-helper-420> else
+                ; we finished roughing on the StartY side
+                g1 x#<EndX> y#<StartY>
+
+                o<rectangular-pocket-1-helper-422> if [ #<EndY> GT #<StartY> ]
+                    ; start finishing in the bottom left corner
+                    g1 x#<StartX> y#<StartY>
+                    g1 x#<StartX> y#<EndY>
+                    g1 x#<EndX>   y#<EndY>
+                    g1 x#<EndX>   y#<StartY>
+                o<rectangular-pocket-1-helper-422> else
+                    ; start finishing in the top left corner
+                    g1 x#<EndX>   y#<EndY>
+                    g1 x#<StartX> y#<EndY>
+                    g1 x#<StartX> y#<StartY>
+                    g1 x#<EndX>   y#<StartY>
+                o<rectangular-pocket-1-helper-422> endif
+
+            o<rectangular-pocket-1-helper-420> endif
+
+        o<rectangular-pocket-1-helper-400> endif
+
+    o<rectangular-pocket-1-helper-optional-finish-pass> endif
+
+    g0 z#<ZSafe>
+
+o<rectangular-pocket-1-helper> endsub
+
+m2
+

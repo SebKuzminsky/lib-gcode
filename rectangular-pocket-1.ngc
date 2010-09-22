@@ -1,0 +1,138 @@
+
+;
+; Better have the spindle running, speed & feed set properly, and cutter
+; comp off before calling this function!
+;
+; This subroutine makes a rectangular pocket by the following process:
+;
+;     0.  adjust HorizontalDOC and VerticalDOC down to make things work out
+;         to even passes
+;
+;     1.  rapid the cutter to near the starting X Y coordinates, optionally
+;         leaving a little material for the finishing pass
+;
+;     2.  rapid to the retract level Z coordinate
+;
+;     3.  feed down to the starting Z coordinate, the top of the material 
+;
+;     Z Loop:
+;
+;         4.  Feed straight down by the Z Depth Of Cut, but not below the
+;             Pocket Bottom Z.
+;
+;         Horizontal Loop:
+;
+;             5.  feed to near the final Y coordinate, optionally leaving a
+;                 little material for the finishing pass
+;
+;             6.  if there is more material to remove at this Z level:
+;
+;                 7.  feed towards the final X coordinate by the Horizontal
+;                     Depth Of Cut, but not past the final X coordinate and
+;                     optional finish allowance
+;
+;                 8.  feed to near the starting Y coordinate, optionally
+;                     leaving a little material for the finishing pass
+;
+;             9.  if there is more material to remove at this Z level, feed
+;                 towards the final X coordinate by the Horizontal Depth Of
+;                 Cut, but not past the final X coordinate and optional
+;                 finish allowance
+;
+;             10. if we're not done yet, repeat the Horizontal Loop
+;
+;         11. if we're not down to the Pocket Bottom Z yet, repeat the Z Loop
+;
+;     Optional finishing pass:
+;
+;         12. If the FinishAllowance argument (arg 10) is greater than
+;             zero, do a climbing finish pass around perimeter of the
+;             pocket, out to the final dimensions
+;
+; 13. rapid to the Z retract level
+;
+;
+; Arg 1:  X coordinate of start of pocket
+;
+; Arg 2:  Y coordinate of start of pocket
+;
+; Arg 3:  X coordinate of end of pocket
+;
+; Arg 4:  Y coordinate of end of pocket
+;
+; Arg 5:  Z coordinate at top of pocket (cutting starts here)
+;
+; Arg 6:  Z coordinate of bottom of pocket
+;
+; Arg 7:  Retract level: Z coordinate to rapid to before starting cutting
+;         and to retract to when finished pocketing
+;
+; Arg 8:  Max horizontal depth-of-cut.  On each feed except the first, the
+;         cutter will remove no more than this much.
+;
+; Arg 9:  Max vertical depth-of-cut.
+;
+; Arg 10: Finish allowance.  This much material will be left during
+;         roughing and cleaned up in the finishing pass.  If this is 0, the
+;         pocket will be cut to size during the "roughing" passes and no
+;         finish pass will be done.
+;
+; The pocket will be cut *without* cutter comp, so make sure the X and Y
+; coordinates take into account the cutter radius.
+;
+
+
+o<rectangular-pocket-1> sub
+    #<StartX> = #1
+    #<StartY> = #2
+
+    #<EndX> = #3
+    #<EndY> = #4
+
+    #<ZTop> = #5
+    #<ZBottom> = #6
+
+    #<ZSafe> = #7
+
+    #<HorizontalDOC> = #8
+    #<VerticalDOC> = #9
+
+    #<FinishAllowance> = #10
+
+
+    ; total amount of Z to cover in all roughing passes combined
+    #<RoughZLength> = [[#<ZTop> - #<ZBottom>] - #<FinishAllowance>]
+
+    ; total number of Z roughing passes
+    ; examples:
+    ;     RoughZLength = 0.990, VerticalDOC = 0.500
+    ;     RoughZPasses = FUP[RoughZLength / VerticalDOC]
+    ;     RoughZPasses = FUP[0.990 / 0.500]
+    ;     RoughZPasses = FUP[1.98]
+    ;     RoughZPasses = 2
+    ;
+    ;     RoughZLength = 1.200, VerticalDOC = 0.500
+    ;     RoughZPasses = FUP[RoughZLength / VerticalDOC]
+    ;     RoughZPasses = FUP[1.200 / 0.500]
+    ;     RoughZPasses = FUP[2.39]
+    ;     RoughZPasses = 3
+    #<RoughZPasses> = FUP[#<RoughZLength> / #<VerticalDOC>]
+
+    ; actual vertical depth-of-cut per roughing pass
+    #<RoughZDOC> = [ #<RoughZLength> / #<RoughZPasses> ]
+
+    #<Pass> = 0
+    o<rectangular-pocket-2-100> while [ #<Pass> LT #<RoughZPasses> ]
+        #<Pass> = [ #<Pass> + 1 ]
+
+        #<CutZ> = [#<ZTop> - [#<Pass> * #<RoughZDOC>]]
+
+        o<rectangular-pocket-1-helper> call [#<StartX>] [#<StartY>] [#<EndX>] [#<EndY>] [#<CutZ>] [#<ZSafe>] [#<HorizontalDOC>] [#<FinishAllowance>] [0]
+    o<rectangular-pocket-1-100> endwhile
+
+    o<rectangular-pocket-1-helper> call [#<StartX>] [#<StartY>] [#<EndX>] [#<EndY>] [#<ZBottom>] [#<ZSafe>] [#<HorizontalDOC>] [#<FinishAllowance>] [1]
+
+o<rectangular-pocket-1> endsub
+
+m2
+
