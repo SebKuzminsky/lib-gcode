@@ -122,7 +122,7 @@ o<rectangular-pocket-1> sub
     #<RoughZDOC> = [ #<RoughZLength> / #<RoughZPasses> ]
 
     #<Pass> = 0
-    o<rectangular-pocket-2-100> while [ #<Pass> LT #<RoughZPasses> ]
+    o<rectangular-pocket-1-100> while [ #<Pass> LT #<RoughZPasses> ]
         #<Pass> = [ #<Pass> + 1 ]
 
         #<CutZ> = [#<ZTop> - [#<Pass> * #<RoughZDOC>]]
