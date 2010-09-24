@@ -102,33 +102,34 @@ o<rectangular-pocket-1> sub
 
     ; total amount of Z to cover in all roughing passes combined
     #<RoughZLength> = [[#<ZTop> - #<ZBottom>] - #<FinishAllowance>]
+    o<rectangular-pocket-1-50> if [ #<RoughZLength> GT 0 ]
+        ; total number of Z roughing passes
+        ; examples:
+        ;     RoughZLength = 0.990, VerticalDOC = 0.500
+        ;     RoughZPasses = FUP[RoughZLength / VerticalDOC]
+        ;     RoughZPasses = FUP[0.990 / 0.500]
+        ;     RoughZPasses = FUP[1.98]
+        ;     RoughZPasses = 2
+        ;
+        ;     RoughZLength = 1.200, VerticalDOC = 0.500
+        ;     RoughZPasses = FUP[RoughZLength / VerticalDOC]
+        ;     RoughZPasses = FUP[1.200 / 0.500]
+        ;     RoughZPasses = FUP[2.39]
+        ;     RoughZPasses = 3
+        #<RoughZPasses> = FUP[#<RoughZLength> / #<VerticalDOC>]
 
-    ; total number of Z roughing passes
-    ; examples:
-    ;     RoughZLength = 0.990, VerticalDOC = 0.500
-    ;     RoughZPasses = FUP[RoughZLength / VerticalDOC]
-    ;     RoughZPasses = FUP[0.990 / 0.500]
-    ;     RoughZPasses = FUP[1.98]
-    ;     RoughZPasses = 2
-    ;
-    ;     RoughZLength = 1.200, VerticalDOC = 0.500
-    ;     RoughZPasses = FUP[RoughZLength / VerticalDOC]
-    ;     RoughZPasses = FUP[1.200 / 0.500]
-    ;     RoughZPasses = FUP[2.39]
-    ;     RoughZPasses = 3
-    #<RoughZPasses> = FUP[#<RoughZLength> / #<VerticalDOC>]
+        ; actual vertical depth-of-cut per roughing pass
+        #<RoughZDOC> = [ #<RoughZLength> / #<RoughZPasses> ]
 
-    ; actual vertical depth-of-cut per roughing pass
-    #<RoughZDOC> = [ #<RoughZLength> / #<RoughZPasses> ]
+        #<Pass> = 0
+        o<rectangular-pocket-1-100> while [ #<Pass> LT #<RoughZPasses> ]
+            #<Pass> = [ #<Pass> + 1 ]
 
-    #<Pass> = 0
-    o<rectangular-pocket-1-100> while [ #<Pass> LT #<RoughZPasses> ]
-        #<Pass> = [ #<Pass> + 1 ]
+            #<CutZ> = [#<ZTop> - [#<Pass> * #<RoughZDOC>]]
 
-        #<CutZ> = [#<ZTop> - [#<Pass> * #<RoughZDOC>]]
-
-        o<rectangular-pocket-1-helper> call [#<StartX>] [#<StartY>] [#<EndX>] [#<EndY>] [#<CutZ>] [#<ZSafe>] [#<HorizontalDOC>] [#<FinishAllowance>] [0]
-    o<rectangular-pocket-1-100> endwhile
+            o<rectangular-pocket-1-helper> call [#<StartX>] [#<StartY>] [#<EndX>] [#<EndY>] [#<CutZ>] [#<ZSafe>] [#<HorizontalDOC>] [#<FinishAllowance>] [0]
+        o<rectangular-pocket-1-100> endwhile
+    o<rectangular-pocket-1-50> endif
 
     o<rectangular-pocket-1-helper> call [#<StartX>] [#<StartY>] [#<EndX>] [#<EndY>] [#<ZBottom>] [#<ZSafe>] [#<HorizontalDOC>] [#<FinishAllowance>] [1]
 
