@@ -131,7 +131,9 @@ o<rectangular-pocket-1> sub
         o<rectangular-pocket-1-100> endwhile
     o<rectangular-pocket-1-50> endif
 
-    o<rectangular-pocket-1-helper> call [#<StartX>] [#<StartY>] [#<EndX>] [#<EndY>] [#<ZBottom>] [#<ZSafe>] [#<HorizontalDOC>] [#<FinishAllowance>] [1]
+    o<rectangular-pocket-1-200> if [#<FinishAllowance> GT 0]
+        o<rectangular-pocket-1-helper> call [#<StartX>] [#<StartY>] [#<EndX>] [#<EndY>] [#<ZBottom>] [#<ZSafe>] [#<HorizontalDOC>] [#<FinishAllowance>] [1]
+    o<rectangular-pocket-1-200> endif
 
 o<rectangular-pocket-1> endsub
 
