@@ -38,6 +38,9 @@ o<helix-hole-1> sub
 
     o100 while [#<CurrentZ> GT #<FinalZ>]
         #<CurrentZ> = [#<CurrentZ> - #<ZIncrement>]
+        o150 if [#<CurrentZ> LT #<FinalZ>]
+            #<CurrentZ> = #<FinalZ>
+        o150 endif
         g3 i#<X> j#<Y> z#<CurrentZ>
     o100 endwhile
     g3 i#<X> j#<Y> z#<CurrentZ>  ; one last lap to flatten the bottom
