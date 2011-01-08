@@ -1,0 +1,18 @@
+
+o<stow-0> sub
+    ; cancel cutter comp
+    g40
+
+    ; quill up
+    g53 g0 z0
+
+    ; spindle off
+    m5
+
+    ; rapid to stowed position
+    ; table centered in X, all the way back away from the user
+    g53 g0 x9 y0
+o<stow-0> endsub
+
+m2
+
