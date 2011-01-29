@@ -1,5 +1,8 @@
 
 o<presentation-position-0> sub
+    ; switch to absolute motion mode
+    g90
+
     ; cancel cutter comp
     g40
 
