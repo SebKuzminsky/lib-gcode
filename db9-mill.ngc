@@ -1,0 +1,55 @@
+
+; 
+; Code to mill a hole for a DB-9 connector.  Intended to be used with the
+; db9-drill program.
+;
+; The total extent of the DB-9 connector hole program is X=0.984, Y=0.200.
+; The total extent of the material removal is larger by 1/16" in all 4 directions.
+;
+; Originally written by Chris Radek, with minor tweaks by Sebastian Kuzminsky.
+;
+
+
+o<db9-mill> sub
+    #<X_Offset> = #1
+    #<Y_Offset> = #2
+    #<SafeZ> = #3
+    #<RetractZ> = #4
+    #<MillZ> = #5
+
+    G64
+    G17 G20 G40 G49
+    G54 G80 G90 G94
+    g91.1
+
+    m5
+    g0 z#<SafeZ>
+
+    s1000 m3
+    m0
+
+    g0 x[0.2541 + #<X_Offset>] Y[0.0000 + #<Y_Offset>]
+    g0 z#<RetractZ>
+
+
+    f6
+    g1 z#<MillZ>
+
+    f8
+    g2 x[0.2472 + #<X_Offset>] y[0.0058 + #<Y_Offset>] I0.0000 J0.0070
+    g1 x[0.2144 + #<X_Offset>] y[0.1918 + #<Y_Offset>]
+    g2 x[0.2213 + #<X_Offset>] y[0.2000 + #<Y_Offset>] I0.0069 J0.0012
+    g1 x[0.7627 + #<X_Offset>] y[0.2000 + #<Y_Offset>]
+    g2 x[0.7696 + #<X_Offset>] y[0.1918 + #<Y_Offset>] I0.0000 J-0.0070
+    g1 x[0.7368 + #<X_Offset>] y[0.0058 + #<Y_Offset>]
+    g2 x[0.7299 + #<X_Offset>] y[0.0000 + #<Y_Offset>] I-0.0069 J0.0012
+    g1 x[0.2541 + #<X_Offset>] y[0.0000 + #<Y_Offset>]
+
+    g1 z#<RetractZ>
+    m5
+    g0 z#<SafeZ>
+
+o<db9-mill> endsub
+
+M02
+

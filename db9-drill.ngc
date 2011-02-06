@@ -1,0 +1,40 @@
+
+; 
+; Code to drill mounting holes for a DB-9 connector  Intended to be used
+; with the db9-mill program.
+;
+; The total extent of the DB-9 connector hole program is X=0.984, Y=0.200.
+; The total extent of the material removal is larger by 1/16" in all 4 directions.
+;
+; Originally written by Chris Radek, with tweaks by Sebastian Kuzminsky.
+;
+
+
+o<db9-drill> sub
+    #<X_Offset> = #1
+    #<Y_Offset> = #2
+    #<SafeZ> = #3
+    #<RetractZ> = #4
+    #<DrillZ> = #5
+
+    G64
+    G17 G20 G40 G49
+    G54 G80 G90 G94
+
+    m5
+    g0 z#<SafeZ>
+
+    s3000 m3
+    m0
+
+    f12
+
+    g81 x[0.984 + #<X_Offset>] y[0.1000 + #<Y_Offset>] z#<DrillZ> r#<RetractZ>
+    g81 x[0.000 + #<X_Offset>] y[0.1000 + #<Y_Offset>]
+
+    m5
+    g0 z#<SafeZ>
+o<db9-drill> endsub
+
+m02
+
