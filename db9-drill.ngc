@@ -17,9 +17,13 @@ o<db9-drill> sub
     #<RetractZ> = #4
     #<DrillZ> = #5
 
-    G64
-    G17 G20 G40 G49
-    G54 G80 G90 G94
+    G64 ; "best speed" path following
+    G17 ; XY plane
+    G20 ; imperial units
+    G40 ; cancel cutter comp
+    G80 ; cancel canned cycle
+    G90 ; absolute distance mode
+    G94 ; feed rate is ipm
 
     m5
     g0 z#<SafeZ>
