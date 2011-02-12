@@ -26,7 +26,7 @@ o<db9-mill> sub
     g0 z#<SafeZ>
 
     s1000 m3
-    m0
+    m1
 
     g0 x[0.2541 + #<X_Offset>] Y[0.0000 + #<Y_Offset>]
     g0 z#<RetractZ>

@@ -25,7 +25,7 @@ o<db9-drill> sub
     g0 z#<SafeZ>
 
     s3000 m3
-    m0
+    m1
 
     f12
 
