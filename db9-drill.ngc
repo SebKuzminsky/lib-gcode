@@ -1,10 +1,8 @@
 
 ; 
-; Code to drill mounting holes for a DB-9 connector  Intended to be used
-; with the db9-mill program.
-;
-; The total extent of the DB-9 connector hole program is X=0.984, Y=0.200.
-; The total extent of the material removal is larger by 1/16" in all 4 directions.
+; Code to drill mounting holes for a DB-9 connector.  Intended to be used
+; with the db9-mill program.  Assumes a 1/8" drill bit is loaded in the
+; spindle.
 ;
 ; Originally written by Chris Radek, with tweaks by Sebastian Kuzminsky.
 ;

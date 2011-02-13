@@ -1,10 +1,12 @@
 
 ; 
 ; Code to mill a hole for a DB-9 connector.  Intended to be used with the
-; db9-drill program.
+; db9-drill program.  Assumes a 1/8" center-cutting end mill is loaded in
+; the spindle.
 ;
-; The total extent of the DB-9 connector hole program is X=0.984, Y=0.200.
-; The total extent of the material removal is larger by 1/16" in all 4 directions.
+; The total extent of the DB-9 connector hole, this program and db9-drill,
+; is X=0.984, Y=0.264.  The total extent of the material removal is larger,
+; by 1/16", in all 4 directions.
 ;
 ; Originally written by Chris Radek, with minor tweaks by Sebastian Kuzminsky.
 ;
