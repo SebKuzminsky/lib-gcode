@@ -8,10 +8,10 @@
 ;     0.  adjust HorizontalDOC and VerticalDOC down to make things work out
 ;         to even passes
 ;
-;     1.  rapid the cutter to near the starting X Y coordinates, optionally
-;         leaving a little material for the finishing pass
+;     1.  rapid to the retract Z level
 ;
-;     2.  rapid to the retract level Z coordinate
+;     2.  rapid the cutter to near the starting X Y coordinates, optionally
+;         leaving a little material for the finishing pass
 ;
 ;     3.  feed down to the starting Z coordinate, the top of the material 
 ;
@@ -98,6 +98,9 @@ o<rectangular-pocket-1> sub
     #<VerticalDOC> = #9
 
     #<FinishAllowance> = #10
+
+
+    g0 z#<ZSafe>
 
 
     ; total amount of Z to cover in all roughing passes combined
