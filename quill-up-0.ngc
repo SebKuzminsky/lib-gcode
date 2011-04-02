@@ -1,0 +1,17 @@
+
+o<quill-up-0> sub
+    ; switch to absolute motion mode
+    g90
+
+    ; cancel cutter comp
+    g40
+
+    ; quill up
+    g53 g0 z0
+
+    ; spindle off
+    m5
+o<quill-up-0> endsub
+
+m2
+
