@@ -1,0 +1,117 @@
+
+;
+; A rectangle with rounded corners.
+; Lower left corner (not counting corner rounding) is at X=0, Y=0.
+; Material surface it at Z=0.
+; Does conventional milling (moving counter-clockwise) around the outline of the square.
+; Uses the tool currently in the spindle, and the current speeds & feeds.
+; Uses cutter comp, entry move should is above the work, inside the square.
+; Disables cutter comp at the end, parking the tool above the work, inside the square.
+;
+
+o<mill-rectangle-0> sub
+    #<x_left> = #1
+    #<y_bottom> = #2
+
+    #<x_extent> = #3
+    #<y_extent> = #4
+
+    #<corner_radius> = #5
+
+    #<safe_z> = #6
+    #<mill_z> = #7
+
+    #<start_corner> = #8  ; 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
+
+    ; arc centers are relative
+    g91.1
+
+    g0 z#<safe_z>
+
+    g0 x[#<x_left> + #<x_extent>/2] y[#<y_bottom> + #<y_extent>/2]
+    g0 z0.010
+
+    ; cutter comp on, tool to the right of the path
+    g42
+
+
+    ;
+    ; cutter-comp entry move above the work goes to the designated starting corner
+    ;
+    ; first move is from the center of the plate to the starting corner,
+    ; around the corner, then ramping down the first edge
+    ;
+    ; then four corner & edge pairs, the final one cleans up the ramp & frees the part
+    ;
+
+    #<corner> = #<start_corner>
+    #<z> = 0.010
+
+    o200 repeat [5]
+
+        o100 if [#<corner> EQ 0]
+            #<arc_start_x> = #<corner_radius>
+            #<arc_start_y> = #<y_extent>
+            #<arc_i> = 0
+            #<arc_j> = -#<corner_radius>
+            #<arc_end_x> = 0
+            #<arc_end_y> = [#<y_extent> - #<corner_radius>]
+            #<edge_end_x> = 0
+            #<edge_end_y> = #<corner_radius>
+        o100 endif
+
+        o101 if [#<corner> EQ 1]
+            #<arc_start_x> = #<x_extent>
+            #<arc_start_y> = [#<y_extent> - #<corner_radius>]
+            #<arc_i> = -#<corner_radius>
+            #<arc_j> = 0
+            #<arc_end_x> = [#<x_extent> - #<corner_radius>]
+            #<arc_end_y> = #<y_extent>
+            #<edge_end_x> = #<corner_radius>
+            #<edge_end_y> = #<y_extent>
+        o101 endif
+
+        o102 if [#<corner> EQ 2]
+            #<arc_start_x> = [#<x_extent> - #<corner_radius>]
+            #<arc_start_y> = 0
+            #<arc_i> = 0
+            #<arc_j> = #<corner_radius>
+            #<arc_end_x> = #<x_extent>
+            #<arc_end_y> = #<corner_radius>
+            #<edge_end_x> = #<x_extent>
+            #<edge_end_y> = [#<y_extent> - #<corner_radius>]
+        o102 endif
+
+        o103 if [#<corner> EQ 3]
+            #<arc_start_x> = 0
+            #<arc_start_y> = #<corner_radius>
+            #<arc_i> = #<corner_radius>
+            #<arc_j> = 0
+            #<arc_end_x> = #<corner_radius>
+            #<arc_end_y> = 0
+            #<edge_end_x> = [#<x_extent> - #<corner_radius>]
+            #<edge_end_y> = 0
+        o103 endif
+
+        ; go to the start of the corner arc
+        g1 x[#<x_left> + #<arc_start_x>] y[#<y_bottom> + #<arc_start_y>]
+
+        ; arc around the corner
+        g3 x[#<x_left> + #<arc_end_x>] y[#<y_bottom> + #<arc_end_y>] i#<arc_i> j#<arc_j>
+
+        ; and cut the edge
+        ; the Z here ramps down on the first cut, then stays low
+        g1 x[#<x_left> + #<edge_end_x>] y[#<y_bottom> + #<edge_end_y>] z#<mill_z>
+
+        #<corner> = [[#<corner> - 1] MOD 4]
+    o200 endrepeat
+
+    g1 z0.010
+
+    g40
+
+    g0 x[#<x_extent>/2] y[#<y_extent>/2] z#<safe_z>
+o<mill-rectangle-0> endsub
+
+m2
+
