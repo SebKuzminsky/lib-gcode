@@ -1,0 +1,33 @@
+
+;
+; Drills four holes, inset slightly from the corners of a rectangle.
+; One corner of the square is at X=0, Y=0; the diagonal corner is at X=#1, Y=#1.
+; The holes are inset by #2 in X and Y
+; Uses the tool currently in the spindle, and the current feed and speed
+;
+
+o<drill-rectangle-0> sub
+    #<x_left> = #1
+    #<y_bottom> = #2
+
+    #<x_extent> = #3
+    #<y_extent> = #4
+
+    #<edge_to_hole> = #5
+
+    #<safe_z> = #6
+    #<drill_z> = #7
+
+    g0 z#<safe_z>
+
+    g81 x[#<x_left> + #<edge_to_hole>]               y[#<y_bottom> + #<edge_to_hole>]               z#<drill_z> r0.1 
+    g81 x[#<x_left> + #<x_extent> - #<edge_to_hole>] y[#<y_bottom> + #<edge_to_hole>]               z#<drill_z> r0.1 
+
+    g81 x[#<x_left> + #<x_extent> - #<edge_to_hole>] y[#<y_bottom> + #<y_extent> - #<edge_to_hole>] z#<drill_z> r0.1 
+    g81 x[#<x_left> + #<edge_to_hole>]               y[#<y_bottom> + #<y_extent> - #<edge_to_hole>] z#<drill_z> r0.1 
+
+    g0 z#<safe_z>
+o<drill-rectangle-0> endsub
+
+m2
+
