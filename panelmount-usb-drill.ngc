@@ -1,0 +1,29 @@
+
+
+; usb drill
+o<panelmount-usb-drill> sub
+    #<x_offset> = #1
+    #<y_offset> = #2
+    #<safe_z> = #3
+    #<retract_z> = #4
+    #<drill_z> = #5
+
+    #<usb_x_extent> = 1.160
+    #<usb_y_extent> = 0.475
+
+    G17 ; XY plane
+    G20 ; imperial units
+    G40 ; cancel cutter comp
+    G90 ; absolute distance mode
+
+    g0 z#<safe_z>
+
+    g81 x[0.000 + #<x_offset>] y[[#<usb_y_extent>/2] + #<y_offset>] z#<drill_z> r#<retract_z>
+    g81 x[#<usb_x_extent> + #<x_offset>]
+
+    g1 z#<retract_z>
+    g0 z#<safe_z>
+o<panelmount-usb-drill> endsub
+
+m2
+

@@ -1,0 +1,19 @@
+
+#<x> = 1
+#<y> = -2
+#<cutter_radius> = [1 / 8]
+#<safe_z> = 1.5
+#<retract_z> = 0.050
+#<mill_z> = -0.250
+#<drill_z> = -0.350
+
+o<init-0> call
+
+s3000 m3 g43
+f10
+
+o<panelmount-usb-mill> call [#<x>] [#<y>] [#<cutter_radius>] [#<safe_z>] [#<retract_z>] [#<mill_z>]
+o<panelmount-usb-drill> call [#<x>] [#<y>] [#<safe_z>] [#<retract_z>] [#<drill_z>]
+o<panelmount-usb-cap-drill> call [#<x>] [#<y>] [#<safe_z>] [#<retract_z>] [#<drill_z>]
+
+m2

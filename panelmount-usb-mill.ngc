@@ -1,0 +1,37 @@
+
+o<panelmount-usb-mill> sub
+    #<x_offset> = #1
+    #<y_offset> = #2
+    #<cutter_radius> = #3
+    #<safe_z> = #4
+    #<retract_z> = #5
+    #<mill_z> = #6
+
+    #<usb_x_extent> = 1.160
+    #<usb_y_extent> = 0.475
+
+    #<usb_plug_x_extent> = 0.875
+    #<usb_plug_y_extent> = 0.475
+
+    G17   ; XY plane
+    G20   ; imperial units
+    G40   ; cancel cutter comp
+    G80   ; cancel canned cycle
+    G90   ; absolute distance mode
+
+    g0 z#<safe_z>
+    g0 x[[#<usb_x_extent>/2] - [#<usb_plug_x_extent>/2] + #<cutter_radius> + #<x_offset>] y[#<cutter_radius> + #<y_offset>]
+    g0 z#<retract_z>
+
+    g1 y[#<usb_plug_y_extent> - #<cutter_radius> + #<y_offset>] z#<mill_z>
+    g1 x[[#<usb_x_extent>/2] + [#<usb_plug_x_extent>/2] + #<x_offset> - #<cutter_radius>]
+    g1 y[#<cutter_radius> + #<y_offset>]
+    g1 x[[#<usb_x_extent>/2] - [#<usb_plug_x_extent>/2] + #<cutter_radius> + #<x_offset>]
+    g1 y[#<usb_plug_y_extent> - #<cutter_radius> + #<y_offset>]
+
+    g1 z#<retract_z>
+    g0 z#<safe_z>
+o<panelmount-usb-mill> endsub
+
+m2
+
