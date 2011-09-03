@@ -1,0 +1,35 @@
+
+o<panelmount-cap-drill> sub
+    #<x_center> = #1
+    #<y_center> = #2
+    #<safe_z> = #3
+    #<retract_z> = #4
+    #<drill_z> = #5
+
+    #<cap_x_extent> = 1.450
+    #<cap_y_extent> = 0.750
+
+    G17 ; XY plane
+    G20 ; imperial units
+    G40 ; cancel cutter comp
+    G90 ; absolute distance mode
+
+    #<left_x> = [#<x_center> - [#<cap_x_extent> / 2]]
+    #<right_x> = [#<left_x> + #<cap_x_extent>]
+
+    #<lower_y> = [#<y_center> - [#<cap_y_extent> / 2]]
+    #<upper_y> = [#<lower_y> + #<cap_y_extent>]
+
+    g0 z#<safe_z>
+
+    g81 x[#<left_x>]   y[#<lower_y>]  z#<drill_z> r#<retract_z>
+    g81 x[#<left_x>]   y[#<upper_y>]  z#<drill_z> r#<retract_z>
+    g81 x[#<right_x>]  y[#<upper_y>]  z#<drill_z> r#<retract_z>
+    g81 x[#<right_x>]  y[#<lower_y>]  z#<drill_z> r#<retract_z>
+
+    g1 z#<retract_z>
+    g0 z#<safe_z>
+o<panelmount-cap-drill> endsub
+
+m2
+
