@@ -28,11 +28,11 @@ o<db9-mill> sub
     G94   ; feed is in ipm
     g91.1 ; arc centers are relative
 
-    m5
+    ;m5
     g0 z#<SafeZ>
 
-    s1000 m3
-    m1
+    ;s1000 m3
+    ;m1
 
     g0 x[0.2541 + #<X_Offset>] Y[0.0000 + #<Y_Offset>]
     g0 z#<RetractZ>
@@ -52,7 +52,7 @@ o<db9-mill> sub
     g1 x[0.2541 + #<X_Offset>] y[0.0000 + #<Y_Offset>]
 
     g1 z#<RetractZ>
-    m5
+    ;m5
     g0 z#<SafeZ>
 
 o<db9-mill> endsub

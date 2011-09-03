@@ -27,14 +27,11 @@ o<db9-drill> sub
     g0 z#<SafeZ>
 
     s3000 m3
-    m1
-
     f12
 
     g81 x[0.984 + #<X_Offset>] y[0.1000 + #<Y_Offset>] z#<DrillZ> r#<RetractZ>
     g81 x[0.000 + #<X_Offset>] y[0.1000 + #<Y_Offset>]
 
-    m5
     g0 z#<SafeZ>
 o<db9-drill> endsub
 
