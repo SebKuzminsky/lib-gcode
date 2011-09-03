@@ -1,4 +1,8 @@
 
+;
+; assumes a 1/8" center-cutting end mill
+;
+
 o<panelmount-usb-mill> sub
     #<x_offset> = #1
     #<y_offset> = #2
