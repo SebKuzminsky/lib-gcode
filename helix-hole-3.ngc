@@ -55,7 +55,7 @@ o<helix-hole-3> sub
     g90.1 ; arc centers are absolute
 
     g0 z#<RetractZ>
-    g0 x[#<X> + #<Radius>] y[#<Y> - .5]
+    g0 x[#<X> - #<Radius>] y[#<Y>-#<Radius>]
     /g41 ; cutter comp on, left of work (climb milling)
 
     g0 x[#<X> + #<Radius>] y#<Y>
@@ -74,9 +74,10 @@ o<helix-hole-3> sub
 
     g3 i#<X> j#<Y> z#<CurrentZ>  ; one last lap to flatten the bottom
 
+    g0 z#<RetractZ>  ; retract cutter
+
     g40 ; cutter comp off
 
-    g0 z#<RetractZ>  ; retract cutter
     g0 x#<X> y#<Y>   ; move the cutter to the center of the hole *after* retracting
 o<helix-hole-3> endsub
 
