@@ -1,0 +1,85 @@
+
+;
+; This subroutine helix-mills a hole at the specified location, of the
+; specified diameter & depth, then retracts the cutter to a specifed Z
+; level.
+;
+; Uses climb cutting (cutter to the left of the work)
+;
+; Arg 1: X coordinate of center of hole
+; Arg 2: Y coordinate of center of hole
+; Arg 3: diameter of hole
+; Arg 4: Z coordinate at top of workpiece (start cutting here)
+; Arg 5: Z increment (depth per revolution)
+; Arg 6: Z coordinate at bottom of hole
+; Arg 7: Retract Z level
+;
+; The motion is:
+;
+;     0.  Rapid to Z retract level.
+;
+;     1.  Rapid X and Y to the vincinity of the hole.
+;
+;     2.  Cutter comp entry move, positioning the cutter inside the hole,
+;         tangent to the right side of the hole: X=[CenterX + Radius],
+;         Y=CenterY
+;
+;     3.  Rapid Z to the start of the cut.
+;
+;     4.  Helix mill down the hole, going DepthPerRev down for each
+;         complete circle around the hole.  The only exception is
+;         (possibly) the last revolution, which may be less deep to reach
+;         the bottom of the hole.
+;
+;     5.  Do one complete circle at the bottom, without changing Z, to give
+;         the hole a flat bottom.
+;
+;     6.  Rapid to the retract Z level.
+;
+;     7.  Cutter comp exit move to X, Y center of hole, but up at Z retract
+;         level.
+;
+
+o<helix-hole-3> sub
+    #<X> = #1
+    #<Y> = #2
+    #<Diameter> = #3
+
+    #<StartZ> = #4
+    #<ZIncrement> = #5
+    #<BottomZ> = #6
+    #<RetractZ> = #7
+
+    #<Radius> = [#<Diameter>/2]
+
+    g90.1 ; arc centers are absolute
+
+    g0 z#<RetractZ>
+    g0 x[#<X> + #<Radius>] y[#<Y> - .5]
+    /g41 ; cutter comp on, left of work (climb milling)
+
+    g0 x[#<X> + #<Radius>] y#<Y>
+    g0 z#<StartZ>
+
+    #<CurrentZ> = #<StartZ>
+
+    o100 while [#<CurrentZ> GT #<BottomZ>]
+        #<CurrentZ> = [#<CurrentZ> + #<ZIncrement>]
+        o110 if [#<CurrentZ> LT #<BottomZ>]
+            #<CurrentZ> = #<BottomZ>
+        o110 endif
+
+        g3 i#<X> j#<Y> z#<CurrentZ>
+    o100 endwhile
+
+    g3 i#<X> j#<Y> z#<CurrentZ>  ; one last lap to flatten the bottom
+
+    g40 ; cutter comp off
+
+    g0 z#<RetractZ>  ; retract cutter
+    g0 x#<X> y#<Y>   ; move the cutter to the center of the hole *after* retracting
+o<helix-hole-3> endsub
+
+m2
+
+

@@ -1,0 +1,83 @@
+
+;
+; This subroutine helix-mills a circular boss at the specified location, of
+; the specified outer diameter & depth, then retracts the cutter to a
+; specifed Z level.
+;
+; Uses regular cutting (cutter to the right of the work)
+;
+; Arg 1: X coordinate of center of boss
+; Arg 2: Y coordinate of center of boss
+; Arg 3: outer diameter of boss
+; Arg 4: Z coordinate at top of workpiece (start cutting here)
+; Arg 5: Z increment (this gets added to the Z coord once per revolution)
+; Arg 6: Z coordinate at bottom of hole
+; Arg 7: Retract Z level
+;
+; The motion is:
+;
+;     0.  Rapid to the retract Z level.
+;
+;     1.  Rapid X and Y to the vincinity of the boss.
+;
+;     2.  Cutter comp entry move, positioning the cutter outside the boss,
+;         tangent to the right side of the boss: X=[CenterX + Radius],
+;         Y=CenterY
+;
+;     3.  Rapid Z to the start of the cut.
+;
+;     4.  Helix mill clockwise down the boss, going DepthPerRev down for each
+;         complete circle around the boss.  The only exception is
+;         (possibly) the last revolution, which may be less deep to reach
+;         the bottom of the boss.
+;
+;     5.  Do one complete circle at the bottom, without changing Z, to make
+;         the area around the bottom of the boss flat.
+;
+;     6.  Rapid to the retract Z level.
+;
+;     7.  Cutter comp exit move to center of boss.
+;
+
+o<helix-boss-1> sub
+    #<CenterX> = #1
+    #<CenterY> = #2
+    #<Diameter> = #3
+
+    #<StartZ> = #4
+    #<ZIncrement> = #5
+    #<BottomZ> = #6
+    #<RetractZ> = #7
+
+    #<Radius> = [#<Diameter>/2]
+
+    g90.1 ; arc centers are absolute
+
+    g0 z#<RetractZ>
+    g0 x[#<CenterX> + #<Radius>] y[#<CenterY> + .5]
+    g41 ; cutter comp on, left of path (climb milling)
+
+    g0 x[#<CenterX> + #<Radius>] y#<CenterY>
+    g0 z#<StartZ>
+
+    #<CurrentZ> = #<StartZ>
+
+    o100 while [#<CurrentZ> GT #<BottomZ>]
+        #<CurrentZ> = [#<CurrentZ> + #<ZIncrement>]
+        o110 if [#<CurrentZ> LT #<BottomZ>]
+            #<CurrentZ> = #<BottomZ>
+        o110 endif
+
+        g2 i#<CenterX> j#<CenterY> z#<CurrentZ>
+    o100 endwhile
+
+    g2 i#<CenterX> j#<CenterY> z#<CurrentZ>  ; one last lap to flatten the bottom
+
+    g0 z#<RetractZ>  ; retract cutter
+
+    g40 ; cutter comp off
+    g0 x#<CenterX> y#<CenterY>
+o<helix-boss-1> endsub
+
+m2
+
