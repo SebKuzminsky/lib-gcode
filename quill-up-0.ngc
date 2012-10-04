@@ -6,9 +6,6 @@ o<quill-up-0> sub
     ; cancel cutter comp
     g40
 
-    ; switch to imperial units
-    g20
-
     ; quill up
     g53 g0 z0
 
