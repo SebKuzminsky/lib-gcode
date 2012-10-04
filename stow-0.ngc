@@ -2,6 +2,9 @@
 o<stow-0> sub
     o<quill-up-0> call
 
+    ; imperial units
+    g20
+
     ; rapid to stowed position
     ; table centered in X, all the way back away from the user
     g53 g0 x9 y0
