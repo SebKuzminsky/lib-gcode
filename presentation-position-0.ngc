@@ -1,10 +1,13 @@
 
 o<presentation-position-0> sub
+    ; switch to imperial units
+    g20
+
     o<quill-up-0> call
 
     ; rapid to presentation position
     ; table centered in X, all the way forward towards the user
-    g53 g0 x9 y12
+    g53 g0 x9 y11.999
 o<presentation-position-0> endsub
 
 m2
