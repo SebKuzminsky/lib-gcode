@@ -26,10 +26,10 @@
 ;
 ;     3.  Rapid Z to the start of the cut.
 ;
-;     4.  Helix mill down the hole, going DepthPerRev down for each
-;         complete circle around the hole.  The only exception is
-;         (possibly) the last revolution, which may be less deep to reach
-;         the bottom of the hole.
+;     4.  Helix mill down the hole, counter-clock-wise, going DepthPerRev
+;         down for each complete circle around the hole.  The only
+;         exception is (possibly) the last revolution, which may be less
+;         deep to reach the bottom of the hole.
 ;
 ;     5.  Do one complete circle at the bottom, without changing Z, to give
 ;         the hole a flat bottom.
@@ -50,12 +50,14 @@ o<helix-hole-3> sub
     #<BottomZ> = #6
     #<RetractZ> = #7
 
+    #<tool_diameter> = #5410
+
     #<Radius> = [#<Diameter>/2]
 
     g90.1 ; arc centers are absolute
 
     g0 z#<RetractZ>
-    g0 x[#<X> - #<Radius>] y[#<Y>-#<Radius>]
+    g0 x[#<X> + #<Radius>] y[#<Y> - #<tool_diameter>]
     /g41 ; cutter comp on, left of work (climb milling)
 
     g0 x[#<X> + #<Radius>] y#<Y>
