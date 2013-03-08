@@ -4,7 +4,7 @@
 ; the specified outer diameter & depth, then retracts the cutter to a
 ; specifed Z level.
 ;
-; Uses regular cutting (cutter to the right of the work)
+; Uses climb cutting (cutter to the left of the work)
 ;
 ; Arg 1: X coordinate of center of boss
 ; Arg 2: Y coordinate of center of boss
