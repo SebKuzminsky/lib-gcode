@@ -10,7 +10,8 @@
 ; Arg 2: Y coordinate of center of hole
 ; Arg 3: diameter of hole
 ; Arg 4: Z coordinate at top of workpiece (start cutting here)
-; Arg 5: Z increment (gets added to Z for each revolution, should probably be negative)
+; Arg 5: Z increment (gets added to Z for each revolution, should probably
+;            be negative)
 ; Arg 6: Z coordinate at bottom of hole
 ; Arg 7: Retract Z level
 ;
