@@ -35,9 +35,11 @@
 ;     5.  Do one complete circle at the bottom, without changing Z, to give
 ;         the hole a flat bottom.
 ;
-;     6.  Rapid to the retract Z level.
+;     6.  Feed to the top-of-work Z level.
 ;
-;     7.  Cutter comp exit move to X, Y center of hole, but up at Z retract
+;     7.  Rapid to the retract Z level.
+;
+;     8.  Cutter comp exit move to X, Y center of hole, but up at Z retract
 ;         level.
 ;
 
@@ -77,6 +79,7 @@ o<helix-hole-3> sub
 
     g3 i#<X> j#<Y> z#<CurrentZ>  ; one last lap to flatten the bottom
 
+    g1 z#<StartZ>    ; retract cutter
     g0 z#<RetractZ>  ; retract cutter
 
     g40 ; cutter comp off
