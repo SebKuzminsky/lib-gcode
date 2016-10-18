@@ -1,0 +1,26 @@
+;
+; This is a simple helper subroutine.  It takes two X coordinates, one
+; Y, and one Z.  If X is currently at the first specified X coordinate,
+; it moves to the second X (and the specified Y and Z).  Otherwise it
+; moves to the first X (and the specified Y and Z).
+;
+; Arg 1: first X
+; Arg 2: second X
+; Arg 3: Y
+; Arg 4: Z
+;
+
+o<other-x-0> sub
+    #<x_first> = #1
+    #<x_second> = #2
+    #<y> = #3
+    #<z> = #4
+
+    o10 if [ #<_x> EQ #<x_first> ]
+        g1 x#<x_second> y#<y> z#<z>
+    o10 else
+        g1 x#<x_first> y#<y> z#<z>
+    o10 endif
+o<other-x-0> endsub
+
+m2
